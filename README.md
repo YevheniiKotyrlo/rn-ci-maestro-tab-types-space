@@ -1,79 +1,15 @@
-# rn-ci-maestro-tab-types-space
+# React Native CI's Maestro 2.6.1 types a space for `pressKey: tab` on Android
 
-![Build](https://github.com/YevheniiKotyrlo/rn-ci-maestro-tab-types-space/workflows/Pre%20Merge%20Checks/badge.svg)
+React Native's Android E2E job installs Maestro with `export MAESTRO_VERSION=2.6.1; curl -Ls "https://get.maestro.mobile.dev" | bash` (`.github/actions/maestro-android/action.yml`). Under that version, a flow's `pressKey: tab` types a space into the focused `TextInput` of RNTester, and keyboard focus stays where it was.
 
-This is your new React Native Reproducer project.
+`./reproduce.sh` takes the newest `main` commit whose Test All run passed and, from that commit and that run:
 
-# Reproducer TODO list
+1. reads the Maestro version `.github/actions/maestro-android/action.yml` installs;
+2. downloads the run's `rntester-release` artifact, the APK `test_e2e_android_rntester` installs (`app-arm64-v8a-release.apk`);
+3. installs that Maestro version with the same installer, into `.repro/` rather than `~/.maestro`;
+4. installs RNTester and opens `rntester://example/TextInput/uncontrolledComponent`;
+5. runs `maestro/focus-input.yml` (`tapOn` the `uncontrolled-textinput`, `eraseText`), then `maestro/press-tab.yml` (`pressKey: tab`), and reads the TextInput's `text` and `focused` from `uiautomator dump` after each.
 
-- [x] 1. Create a new reproducer project.
-- [ ] 2. Git clone your repository locally.
-- [ ] 3. Edit the project to reproduce the failure you're seeing.
-- [ ] 4. Push your changes, so that Github Actions can run the CI.
-- [ ] 5. Make sure the repository is public and share the link with the issue you reported.
+It needs one Android emulator or device on adb (`ANDROID_SERIAL` picks one), `gh` signed in, `curl`, `unzip` and Java 17. It exits 1 while Tab types into the TextInput, 0 once the TextInput stays empty after Tab, and 2 when a step fails before that check. `REPRO_MAESTRO_VERSION=2.12.1 ./reproduce.sh` runs another Maestro version in place of the pin.
 
-# How to use this Reproducer
-
-This project has been created with `npx @react-native-community/cli init` and is a vanilla React Native app.
-
-> [!IMPORTANT]  
-> Make sure you have completed the [React Native - Environment Setup](https://reactnative.dev/docs/set-up-your-environment) so that you have a working environment locally.
-
-## Step 1: Start the Metro Server
-
-First, you will need to start **Metro**, the JavaScript _bundler_ that ships _with_ React Native.
-
-To start Metro, run the following command from the _root_ of your React Native project:
-
-```bash
-# using npm
-npm start
-
-# OR using Yarn
-yarn start
-```
-
-## Step 2: Start your Application
-
-Let Metro Bundler run in its _own_ terminal. Open a _new_ terminal from the _root_ of your React Native project. Run the following command to start your _Android_ or _iOS_ app:
-
-### For Android
-
-```bash
-# using npm
-npm run android
-
-# OR using Yarn
-yarn android
-```
-
-### For iOS
-
-First, make sure you install dependencies with:
-
-```bash
-cd ios && bundle install && bundle exec pod install
-```
-
-Then you can run the iOS app with:
-
-```bash
-# using npm
-npm run ios
-
-# OR using Yarn
-yarn ios
-```
-
-If everything is set up _correctly_, you should see your new app running in your _Android Emulator_ or _iOS Simulator_ shortly provided you have set up your emulator/simulator correctly.
-
-This is one way to run your app — you can also run it directly from within Android Studio and Xcode respectively.
-
-## Step 3: Modifying your App
-
-Now that you have successfully run the app, let's modify it.
-
-1. Open `App.tsx` in your text editor of choice and edit some lines.
-2. For **Android**: Press the <kbd>R</kbd> key twice or select **"Reload"** from the **Developer Menu** (<kbd>Ctrl</kbd> + <kbd>M</kbd> (on Window and Linux) or <kbd>Cmd ⌘</kbd> + <kbd>M</kbd> (on macOS)) to see your changes!
-
-   For **iOS**: Hit <kbd>Cmd ⌘</kbd> + <kbd>R</kbd> in your iOS Simulator to reload the app and see your changes!
+The `ReproducerApp/` folder is the template's and is not used.

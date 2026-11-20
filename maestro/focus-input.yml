@@ -1,0 +1,9 @@
+appId: ${APP_ID}
+---
+- extendedWaitUntil:
+    visible:
+      id: 'uncontrolled-textinput'
+    timeout: 120000
+- tapOn:
+    id: 'uncontrolled-textinput'
+- eraseText
